@@ -5,7 +5,7 @@ import Navbar from "@/components/root/Navbar";
 import Sidebar from "@/components/root/Sidebar";
 
 export const metadata: Metadata = {
-  title: "SOOM",
+  title: "ZOMA",
   description: "A workspace for your team",
 };
 
