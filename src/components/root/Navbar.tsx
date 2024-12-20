@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import MobileNav from "./MobileNav";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   return (
@@ -19,6 +20,9 @@ const Navbar = () => {
         <p className="text-2xl font-bold max-sm:hidden">ZOMA</p>
       </Link>
       <div className="flex justify-between items-center gap-5">
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
         <MobileNav />
       </div>
     </nav>

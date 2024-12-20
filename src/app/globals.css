@@ -6,6 +6,22 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.cl-footerAction__signIn {
+  display: none;
+}
+
+.cl-userButtonPopoverActionButton {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  color: white;
+}
+
+.cl-providerIcon__apple {
+  filter: invert(1);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
