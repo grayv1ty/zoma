@@ -1,9 +1,70 @@
-/* eslint-disable camelcase */
 "use client";
 
-import HomeCard from "./HomeCard";
+import { useState } from "react";
+import HomeCard from "../root/HomeCard";
+import { useRouter } from "next/navigation";
+import MeetingModal from "./MeetingModal";
+import { useUser } from "@clerk/nextjs";
+import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
+import { useToast } from "@/hooks/use-toast";
+
+type Meeting = {
+  dateTime: Date;
+  description: string;
+  link: string;
+};
 
 const MeetingTypeList = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const [meetingState, setMeetingState] = useState<
+    "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
+  >(undefined);
+
+  const { user } = useUser();
+  const client = useStreamVideoClient();
+  const [meeting, setMeeting] = useState<Meeting>({
+    dateTime: new Date(),
+    description: "",
+    link: "",
+  });
+  const [callDetails, setCallDetails] = useState<Call>();
+
+  const createMeeting = async () => {
+    if (!client || !user) return;
+
+    try {
+      if (!meeting.dateTime) {
+        toast({ title: "Please select a date and time" });
+        return;
+      }
+      const id = crypto.randomUUID();
+      const call = client.call("default", id);
+
+      if (!call) throw new Error("Failed to create call");
+      const startsAt =
+        meeting.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const description = meeting.description || "Instant Meeting";
+      await call.getOrCreate({
+        data: {
+          starts_at: startsAt,
+          custom: {
+            description,
+          },
+        },
+      });
+
+      setCallDetails(call);
+
+      if (!meeting.description) router.push(`/meeting/${call.id}`);
+      toast({ title: "Meeting Created" });
+    } catch (error) {
+      console.log(error);
+      toast({ title: "Failed to create Meeting" });
+    }
+  };
+
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       <HomeCard
@@ -26,6 +87,7 @@ const MeetingTypeList = () => {
         title="New Meeting"
         description="Start an instant meeting"
         className="bg-orange-500"
+        handleClick={() => setMeetingState("isInstantMeeting")}
       />
       <HomeCard
         icon={
@@ -47,6 +109,7 @@ const MeetingTypeList = () => {
         title="Join Meeting"
         description="via invitation link"
         className="bg-blue-500"
+        handleClick={() => setMeetingState("isJoiningMeeting")}
       />
       <HomeCard
         icon={
@@ -68,6 +131,7 @@ const MeetingTypeList = () => {
         title="Schedule Meeting"
         description="Plan your meeting"
         className="bg-purple-500"
+        handleClick={() => setMeetingState("isScheduleMeeting")}
       />
       <HomeCard
         icon={
@@ -89,6 +153,15 @@ const MeetingTypeList = () => {
         title="View Recordings"
         description="Meeting Recordings"
         className="bg-yellow-500"
+        handleClick={() => router.push("/recordings")}
+      />
+      <MeetingModal
+        isOpen={meetingState === "isInstantMeeting"}
+        onClose={() => setMeetingState(undefined)}
+        title="Start an Instant Meeting"
+        className="text-center"
+        buttonText="Start Meeting"
+        handleClick={createMeeting}
       />
     </section>
   );

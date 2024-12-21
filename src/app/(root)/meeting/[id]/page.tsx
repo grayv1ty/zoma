@@ -1,7 +1,48 @@
-import React from "react";
+"use client";
+import MeetingRoom from "@/components/meeting/MeetingRoom";
+import MeetingSetup from "@/components/meeting/MeetingSetup";
+import Alert from "@/components/root/Alert";
+import Loader from "@/components/root/Loader";
+import { useGetCallById } from "@/hooks/use-get-call-by-id";
+import { useUser } from "@clerk/nextjs";
+import { StreamCall, StreamTheme } from "@stream-io/video-react-sdk";
+import { useParams } from "next/navigation";
+import React, { useState } from "react";
 
 const Meeting = () => {
-  return <div>Meeting</div>;
+  const { id } = useParams();
+  const { user, isLoaded } = useUser();
+  const [isSetupComplete, setIsSetupComplete] = useState<boolean>(false);
+  const { call, isCallLoading } = useGetCallById(id || "");
+
+  if (!isLoaded || isCallLoading) return <Loader />;
+
+  if (!call)
+    return (
+      <p className="text-center text-3xl font-bold text-white">
+        Call Not Found
+      </p>
+    );
+  const notAllowed =
+    call.type === "invited" &&
+    (!user || !call.state.members.find((m) => m.user.id === user.id));
+
+  if (notAllowed)
+    return <Alert title="You are not allowed to join this meeting" />;
+
+  return (
+    <main className="w-full h-screen">
+      <StreamCall call={call}>
+        <StreamTheme>
+          {isSetupComplete ? (
+            <MeetingRoom />
+          ) : (
+            <MeetingSetup setIsSetupComplete={setIsSetupComplete} />
+          )}
+        </StreamTheme>
+      </StreamCall>
+    </main>
+  );
 };
 
 export default Meeting;
