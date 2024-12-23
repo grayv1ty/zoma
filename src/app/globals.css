@@ -27,6 +27,14 @@ body {
 .cl-providerIcon__apple {
   filter: invert(1);
 }
+.str-video__call-controls {
+  flex-wrap: wrap;
+}
+
+.cl-internal-1hp5nqm,
+.cl-internal-1dauvpw {
+  display: none;
+}
 
 .show-block {
   width: 100%;

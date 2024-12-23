@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Zoma app",
   description: "Video calling App",
+  icons: {
+    icon: "logo.svg",
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +34,7 @@ export default function RootLayout({
         appearance={{
           layout: {
             socialButtonsVariant: "iconButton",
+            logoImageUrl: "logo.svg",
           },
           variables: {
             colorText: "#fff",
@@ -40,6 +44,7 @@ export default function RootLayout({
             colorInputText: "#fff",
             colorTextOnPrimaryBackground: "#fff",
             colorShimmer: "#fff",
+            colorNeutral: "#fff",
           },
         }}
       >

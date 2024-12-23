@@ -22,6 +22,9 @@ export default {
         "green-cyber": {
           1: "#0e78f9",
         },
+        blue: {
+          500: "#0072ff",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
