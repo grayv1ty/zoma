@@ -18,7 +18,7 @@ type Meeting = {
   link: string;
 };
 
-const MeetingTypeList = ({ uuid }: { uuid: string }) => {
+const MeetingTypeList = () => {
   const router = useRouter();
   const { toast } = useToast();
 
