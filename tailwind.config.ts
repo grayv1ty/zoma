@@ -14,8 +14,10 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         dark: {
-          "1": "#1c1f2e",
-          "2": "#161925",
+          1: "#1c1f2e",
+          2: "#161925",
+          3: "#252A41",
+          4: "#1E2757",
         },
         "green-cyber": {
           1: "#0e78f9",
