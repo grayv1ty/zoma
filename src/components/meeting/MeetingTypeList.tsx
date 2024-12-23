@@ -18,12 +18,16 @@ type Meeting = {
   link: string;
 };
 
-const MeetingTypeList = () => {
+const MeetingTypeList = ({ uuid }: { uuid: string }) => {
   const router = useRouter();
   const { toast } = useToast();
 
   const [meetingState, setMeetingState] = useState<
-    "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
+    | "isScheduleMeeting"
+    | "isJoiningMeeting"
+    | "isInstantMeeting"
+    | "joinRoom"
+    | undefined
   >(undefined);
 
   const { user } = useUser();
@@ -35,7 +39,7 @@ const MeetingTypeList = () => {
   });
   const [callDetail, setCallDetail] = useState<Call>();
 
-  const createMeeting = async () => {
+  const createMeeting = async (isRoom?: boolean) => {
     if (!client || !user) return;
 
     try {
@@ -43,7 +47,9 @@ const MeetingTypeList = () => {
         toast({ title: "Please select a date and time" });
         return;
       }
-      const id = crypto.randomUUID();
+
+      const id = isRoom ? "league-room" : crypto.randomUUID();
+
       const call = client.call("default", id);
 
       if (!call) throw new Error("Failed to create call");
@@ -62,7 +68,7 @@ const MeetingTypeList = () => {
       setCallDetail(call);
 
       if (!meeting.description) router.push(`/meeting/${call.id}`);
-      toast({ title: "Meeting Created" });
+      toast({ title: isRoom ? "Joined League Room" : "Meeting Created" });
     } catch (error) {
       console.log(error);
       toast({ title: "Failed to create Meeting" });
@@ -106,6 +112,28 @@ const MeetingTypeList = () => {
 
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <HomeCard
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+            />
+          </svg>
+        }
+        title="League Meeting"
+        description="Join League Room"
+        className="bg-[#ff4a45]"
+        handleClick={() => setMeetingState("joinRoom")}
+      />
       <HomeCard
         icon={
           <svg
@@ -262,6 +290,14 @@ const MeetingTypeList = () => {
         title="Start an Instant Meeting"
         className="text-center"
         buttonText="Start Meeting"
+        handleClick={createMeeting}
+      />
+      <MeetingModal
+        isOpen={meetingState === "joinRoom"}
+        onClose={() => setMeetingState(undefined)}
+        title="League Meeting"
+        className="text-center"
+        buttonText="Join Room"
         handleClick={createMeeting}
       />
     </section>
