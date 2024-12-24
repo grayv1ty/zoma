@@ -39,7 +39,7 @@ const MeetingTypeList = () => {
   });
   const [callDetail, setCallDetail] = useState<Call>();
 
-  const createMeeting = async (isRoom?: boolean) => {
+  const createMeeting = async () => {
     if (!client || !user) return;
 
     try {
@@ -48,7 +48,8 @@ const MeetingTypeList = () => {
         return;
       }
 
-      const id = isRoom ? "league-room" : crypto.randomUUID();
+      const id =
+        meetingState === "joinRoom" ? "league-meeting" : crypto.randomUUID();
 
       const call = client.call("default", id);
 
@@ -68,7 +69,12 @@ const MeetingTypeList = () => {
       setCallDetail(call);
 
       if (!meeting.description) router.push(`/meeting/${call.id}`);
-      toast({ title: isRoom ? "Joined League Room" : "Meeting Created" });
+      toast({
+        title:
+          meetingState === "joinRoom"
+            ? "Joined League Room"
+            : "Meeting Created",
+      });
     } catch (error) {
       console.log(error);
       toast({ title: "Failed to create Meeting" });

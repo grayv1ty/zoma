@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CallControls,
   CallParticipantsList,
@@ -24,7 +24,7 @@ import EndCallButton from "./EndCallButton";
 
 type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
 
-const MeetingRoom = () => {
+const MeetingRoom = ({ id }: { id: string }) => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
   const router = useRouter();
@@ -35,7 +35,20 @@ const MeetingRoom = () => {
   // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
 
-  if (callingState !== CallingState.JOINED) return <Loader />;
+  useEffect(() => {
+    if (callingState === "left") {
+      router.push("/");
+      return;
+    }
+  }, [callingState]);
+
+  if (callingState !== CallingState.JOINED)
+    return (
+      <>
+        {callingState}
+        <Loader />
+      </>
+    );
 
   const CallLayout = () => {
     switch (layout) {
@@ -93,7 +106,7 @@ const MeetingRoom = () => {
             <Users size={20} className="text-white" />
           </div>
         </button>
-        {!isPersonalRoom && <EndCallButton />}
+        {!isPersonalRoom && id !== "league-meeting" && <EndCallButton />}
       </div>
     </section>
   );
