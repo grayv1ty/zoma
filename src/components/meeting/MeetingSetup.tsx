@@ -33,6 +33,7 @@ const MeetingSetup = ({
 
   const getBrowserInstructions = () => {
     const userAgent = navigator.userAgent;
+    console.log("userAgent:", userAgent);
 
     if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
       return `
@@ -52,7 +53,11 @@ const MeetingSetup = ({
       `;
     }
 
-    if (userAgent.includes("Safari")) {
+    if (
+      userAgent.includes("Safari") &&
+      !userAgent.includes("Chrome") &&
+      !userAgent.includes("Edg")
+    ) {
       return `
         Safari:
         1. Go to Preferences > Websites > Microphone.
