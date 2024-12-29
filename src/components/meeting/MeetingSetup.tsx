@@ -9,7 +9,6 @@ import {
 
 import { Button } from "../ui/button";
 import Alert from "../root/Alert";
-import { useToast } from "@/hooks/use-toast";
 
 const MeetingSetup = ({
   setIsSetupComplete,
@@ -24,25 +23,7 @@ const MeetingSetup = ({
     callStartsAt && new Date(callStartsAt) > new Date();
   const callHasEnded = !!callEndedAt;
 
-  const { toast } = useToast();
-
   const call = useCall();
-
-  const requestMicrophonePermission = async () => {
-    const instructions = getBrowserInstructions();
-
-    // Attempt to request permission again
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log("Microphone access granted");
-    } catch (error) {
-      console.error("Error requesting microphone permission:", error);
-      alert(
-        "Microphone access is denied. Please reset microphone permissions in your browser settings to allow access.\n" +
-          instructions
-      );
-    }
-  };
 
   if (!call) {
     throw new Error(
@@ -94,8 +75,24 @@ const MeetingSetup = ({
   // https://getstream.io/video/docs/react/ui-cookbook/replacing-call-controls/
   const [isMicCamToggled, setIsMicCamToggled] = useState(false);
 
+  const { useMicrophoneState, useCameraState } = useCallStateHooks();
+  const { hasBrowserPermission: hasBrowserCameraPermission } = useCameraState();
+  const { hasBrowserPermission: hasBrowserMicrophonePermission } =
+    useMicrophoneState();
+
+  const instruction = getBrowserInstructions();
+
   useEffect(() => {
-    requestMicrophonePermission();
+    if (!hasBrowserCameraPermission) {
+      alert(
+        "You has denied or not granted camera permissions!\n" + instruction
+      );
+    }
+    if (!hasBrowserMicrophonePermission) {
+      alert(
+        "You has denied or not granted microphone permissions!\n" + instruction
+      );
+    }
     if (isMicCamToggled) {
       call.camera.disable();
       call.microphone.disable();
@@ -103,7 +100,14 @@ const MeetingSetup = ({
       call.camera.enable();
       call.microphone.enable();
     }
-  }, [isMicCamToggled, call.camera, call.microphone]);
+  }, [
+    isMicCamToggled,
+    call.camera,
+    call.microphone,
+    hasBrowserCameraPermission,
+    hasBrowserMicrophonePermission,
+    instruction,
+  ]);
 
   if (callTimeNotArrived)
     return (
