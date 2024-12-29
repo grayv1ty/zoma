@@ -9,6 +9,7 @@ import {
 
 import { Button } from "../ui/button";
 import Alert from "../root/Alert";
+import { useToast } from "@/hooks/use-toast";
 
 const MeetingSetup = ({
   setIsSetupComplete,
@@ -23,7 +24,25 @@ const MeetingSetup = ({
     callStartsAt && new Date(callStartsAt) > new Date();
   const callHasEnded = !!callEndedAt;
 
+  const { toast } = useToast();
+
   const call = useCall();
+
+  const requestMicrophonePermission = async () => {
+    const instructions = getBrowserInstructions();
+
+    // Attempt to request permission again
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log("Microphone access granted");
+    } catch (error) {
+      console.error("Error requesting microphone permission:", error);
+      alert(
+        "Microphone access is denied. Please reset microphone permissions in your browser settings to allow access.\n" +
+          instructions
+      );
+    }
+  };
 
   if (!call) {
     throw new Error(
@@ -31,10 +50,52 @@ const MeetingSetup = ({
     );
   }
 
+  const getBrowserInstructions = () => {
+    const userAgent = navigator.userAgent;
+
+    if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+      return `
+        Chrome:
+        1. Click on the lock icon in the address bar.
+        2. Navigate to "Site Settings."
+        3. Under "Permissions," find "Microphone" and set it to "Ask" or "Allow."
+      `;
+    }
+
+    if (userAgent.includes("Firefox")) {
+      return `
+        Firefox:
+        1. Click on the shield icon in the address bar.
+        2. Navigate to "Permissions."
+        3. Modify the "Microphone" permission to "Ask."
+      `;
+    }
+
+    if (userAgent.includes("Safari")) {
+      return `
+        Safari:
+        1. Go to Preferences > Websites > Microphone.
+        2. Find your website and change the permission to "Ask" or "Allow."
+      `;
+    }
+
+    if (userAgent.includes("Edg")) {
+      return `
+        Edge:
+        1. Click on the lock icon in the address bar.
+        2. Navigate to "Permissions for this site."
+        3. Adjust the "Microphone" permission to "Ask" or "Allow."
+      `;
+    }
+
+    return "Your browser is not recognized. Please consult your browser's documentation to reset microphone permissions.";
+  };
+
   // https://getstream.io/video/docs/react/ui-cookbook/replacing-call-controls/
   const [isMicCamToggled, setIsMicCamToggled] = useState(false);
 
   useEffect(() => {
+    requestMicrophonePermission();
     if (isMicCamToggled) {
       call.camera.disable();
       call.microphone.disable();
