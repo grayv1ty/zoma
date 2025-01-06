@@ -204,11 +204,14 @@ const MeetingSetup = ({
             </AlertTitle>
             <AlertDescription>
               {instruction}
-              <div className="flex gap-2 mt-2">
+              <div className="mt-2">
                 You can also try
-                <div className="text-blue-500" onClick={requestPermissions}>
+                <span
+                  className="text-blue-500 mx-1"
+                  onClick={requestPermissions}
+                >
                   reloading the page
-                </div>
+                </span>
                 in some browsers; it might prompt you to grant permission again.
               </div>
             </AlertDescription>
