@@ -41,11 +41,11 @@ const MeetingSetup = ({
         <div>
           <h3>Chrome:</h3>
           <ol>
-            <li>Click on the lock icon in the address bar.</li>
-            <li>Navigate to &quot;Site Settings.&quot;</li>
+            <li>1. Click on the lock icon in the address bar.</li>
+            <li>2. Navigate to &quot;Site Settings.&quot;</li>
             <li>
-              Under &quot;Permissions,&quot; find &quot;Microphone&quot; and set
-              it to &quot;Ask&quot; or &quot;Allow.&quot;
+              3. Under &quot;Permissions,&quot; find &quot;Microphone&quot; and
+              set it to &quot;Ask&quot; or &quot;Allow.&quot;
             </li>
           </ol>
         </div>
@@ -57,10 +57,11 @@ const MeetingSetup = ({
         <div>
           <h3>Firefox:</h3>
           <ol>
-            <li>Click on the shield icon in the address bar.</li>
-            <li>Navigate to &quot;Permissions.&quot;</li>
+            <li>1. Click on the shield icon in the address bar.</li>
+            <li>2. Navigate to &quot;Permissions.&quot;</li>
             <li>
-              Modify the &quot;Microphone&quot; permission to &quot;Ask.&quot;
+              3. Modify the &quot;Microphone&quot; permission to
+              &quot;Ask.&quot;
             </li>
           </ol>
         </div>
@@ -76,10 +77,10 @@ const MeetingSetup = ({
         <div>
           <h3>Safari:</h3>
           <ol>
-            <li>Go to Preferences &gt; Websites &gt; Microphone.</li>
+            <li>1. Go to Preferences &gt; Websites &gt; Microphone.</li>
             <li>
-              Find your website and change the permission to &quot;Ask&quot; or
-              &quot;Allow.&quot;
+              2. Find your website and change the permission to &quot;Ask&quot;
+              or &quot;Allow.&quot;
             </li>
           </ol>
         </div>
@@ -91,11 +92,11 @@ const MeetingSetup = ({
         <div>
           <h3>Edge:</h3>
           <ol>
-            <li>Click on the lock icon in the address bar.</li>
-            <li>Navigate to &quot;Permissions for this site.&quot;</li>
+            <li>1. Click on the lock icon in the address bar.</li>
+            <li>2. Navigate to &quot;Permissions for this site.&quot;</li>
             <li>
-              Adjust the &quot;Microphone&quot; permission to &quot;Ask&quot; or
-              &quot;Allow.&quot;
+              3. Adjust the &quot;Microphone&quot; permission to &quot;Ask&quot;
+              or &quot;Allow.&quot;
             </li>
           </ol>
         </div>
