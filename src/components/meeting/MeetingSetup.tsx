@@ -123,6 +123,10 @@ const MeetingSetup = ({
 
   const instruction = getBrowserInstructions();
 
+  const requestPermissions = () => {
+    window.location.reload();
+  };
+
   useEffect(() => {
     if (isMicCamToggled) {
       if (hasBrowserCameraPermission) call.camera.enable();
@@ -198,7 +202,16 @@ const MeetingSetup = ({
                 : "microphone"}{" "}
               permissions!
             </AlertTitle>
-            <AlertDescription>{instruction}</AlertDescription>
+            <AlertDescription>
+              {instruction}
+              <div className="flex gap-2 mt-2">
+                You can also try
+                <div className="text-blue-500" onClick={requestPermissions}>
+                  reloading the page
+                </div>
+                in some browsers; it might prompt you to grant permission again.
+              </div>
+            </AlertDescription>
           </Alert>
         ) : null}
       </p>
