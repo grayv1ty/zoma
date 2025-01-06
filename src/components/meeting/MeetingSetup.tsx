@@ -6,9 +6,11 @@ import {
   useCall,
   useCallStateHooks,
 } from "@stream-io/video-react-sdk";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Button } from "../ui/button";
-import Alert from "../root/Alert";
+import AlertComponent from "../root/Alert";
+import { AlertCircle } from "lucide-react";
 
 const MeetingSetup = ({
   setIsSetupComplete,
@@ -33,24 +35,36 @@ const MeetingSetup = ({
 
   const getBrowserInstructions = () => {
     const userAgent = navigator.userAgent;
-    console.log("userAgent:", userAgent);
 
     if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
-      return `
-        Chrome:
-        1. Click on the lock icon in the address bar.
-        2. Navigate to "Site Settings."
-        3. Under "Permissions," find "Microphone" and set it to "Ask" or "Allow."
-      `;
+      return (
+        <div>
+          <h3>Chrome:</h3>
+          <ol>
+            <li>Click on the lock icon in the address bar.</li>
+            <li>Navigate to &quot;Site Settings.&quot;</li>
+            <li>
+              Under &quot;Permissions,&quot; find &quot;Microphone&quot; and set
+              it to &quot;Ask&quot; or &quot;Allow.&quot;
+            </li>
+          </ol>
+        </div>
+      );
     }
 
     if (userAgent.includes("Firefox")) {
-      return `
-        Firefox:
-        1. Click on the shield icon in the address bar.
-        2. Navigate to "Permissions."
-        3. Modify the "Microphone" permission to "Ask."
-      `;
+      return (
+        <div>
+          <h3>Firefox:</h3>
+          <ol>
+            <li>Click on the shield icon in the address bar.</li>
+            <li>Navigate to &quot;Permissions.&quot;</li>
+            <li>
+              Modify the &quot;Microphone&quot; permission to &quot;Ask.&quot;
+            </li>
+          </ol>
+        </div>
+      );
     }
 
     if (
@@ -58,27 +72,48 @@ const MeetingSetup = ({
       !userAgent.includes("Chrome") &&
       !userAgent.includes("Edg")
     ) {
-      return `
-        Safari:
-        1. Go to Preferences > Websites > Microphone.
-        2. Find your website and change the permission to "Ask" or "Allow."
-      `;
+      return (
+        <div>
+          <h3>Safari:</h3>
+          <ol>
+            <li>Go to Preferences &gt; Websites &gt; Microphone.</li>
+            <li>
+              Find your website and change the permission to &quot;Ask&quot; or
+              &quot;Allow.&quot;
+            </li>
+          </ol>
+        </div>
+      );
     }
 
     if (userAgent.includes("Edg")) {
-      return `
-        Edge:
-        1. Click on the lock icon in the address bar.
-        2. Navigate to "Permissions for this site."
-        3. Adjust the "Microphone" permission to "Ask" or "Allow."
-      `;
+      return (
+        <div>
+          <h3>Edge:</h3>
+          <ol>
+            <li>Click on the lock icon in the address bar.</li>
+            <li>Navigate to &quot;Permissions for this site.&quot;</li>
+            <li>
+              Adjust the &quot;Microphone&quot; permission to &quot;Ask&quot; or
+              &quot;Allow.&quot;
+            </li>
+          </ol>
+        </div>
+      );
     }
 
-    return "Your browser is not recognized. Please consult your browser's documentation to reset microphone permissions.";
+    return (
+      <div>
+        <p>
+          Your browser is not recognized. Please consult your browser&apos;s
+          documentation to reset microphone permissions.
+        </p>
+      </div>
+    );
   };
 
   // https://getstream.io/video/docs/react/ui-cookbook/replacing-call-controls/
-  const [isMicCamToggled, setIsMicCamToggled] = useState(false);
+  const [isMicCamToggled, setIsMicCamToggled] = useState(true);
 
   const { useMicrophoneState, useCameraState } = useCallStateHooks();
   const { hasBrowserPermission: hasBrowserCameraPermission } = useCameraState();
@@ -88,42 +123,30 @@ const MeetingSetup = ({
   const instruction = getBrowserInstructions();
 
   useEffect(() => {
-    if (!hasBrowserCameraPermission) {
-      alert(
-        "You has denied or not granted camera permissions!\n" + instruction
-      );
-    }
-    if (!hasBrowserMicrophonePermission) {
-      alert(
-        "You has denied or not granted microphone permissions!\n" + instruction
-      );
-    }
     if (isMicCamToggled) {
+      if (hasBrowserCameraPermission) call.camera.enable();
+      if (hasBrowserMicrophonePermission) call.microphone.enable();
+    } else {
       call.camera.disable();
       call.microphone.disable();
-    } else {
-      call.camera.enable();
-      call.microphone.enable();
     }
   }, [
     isMicCamToggled,
-    call.camera,
-    call.microphone,
+    call,
     hasBrowserCameraPermission,
     hasBrowserMicrophonePermission,
-    instruction,
   ]);
 
   if (callTimeNotArrived)
     return (
-      <Alert
+      <AlertComponent
         title={`Your Meeting has not started yet. It is scheduled for ${callStartsAt.toLocaleString()}`}
       />
     );
 
   if (callHasEnded)
     return (
-      <Alert
+      <AlertComponent
         title="The call has been ended by the host"
         icon={
           <svg
@@ -155,10 +178,30 @@ const MeetingSetup = ({
             checked={isMicCamToggled}
             onChange={(e) => setIsMicCamToggled(e.target.checked)}
           />
-          Join with mic and camera off
+          Join with mic and camera
         </label>
         <DeviceSettings />
       </div>
+
+      <p>
+        <br />
+        {!hasBrowserCameraPermission || !hasBrowserMicrophonePermission ? (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>
+              You has denied or not granted{" "}
+              {!hasBrowserCameraPermission && !hasBrowserMicrophonePermission
+                ? "camera and microphone"
+                : !hasBrowserCameraPermission
+                ? "camera"
+                : "microphone"}{" "}
+              permissions!
+            </AlertTitle>
+            <AlertDescription>{instruction}</AlertDescription>
+          </Alert>
+        ) : null}
+      </p>
+
       <Button
         className="rounded-md bg-green-500 px-4 py-2.5"
         onClick={() => {
